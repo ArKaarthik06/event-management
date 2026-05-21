@@ -17,6 +17,8 @@ A full-stack web application designed to help students discover, register for, a
 * **Event Management**: Complete CRUD operations (Create, Read, Update, Delete) for campus events.
 * **Image Uploads**: Upload event banners and images securely using Multer.
 * **Admin Dashboard & Analytics**: Oversee all events, view registration metrics, and manage user participation.
+* **AI Insight Provider**: Leverage AI-based insights to understand existing trends within currently happening events.
+* **Chart-Based Insights**: Visual analytics and interactive charts on the admin dashboard for quick, data-driven decision making.
 * **Export Data**: Easily export event registration data.
 
 ## 🛠️ Technology Stack
