@@ -1,0 +1,108 @@
+<div class="container event-detail">
+  <!-- Event Image -->
+  <img src="<%= event.image %>" alt="<%= event.title %>" class="event-detail-img" onerror="this.src='/assets/default-event.svg'">
+
+  <!-- Category + Title -->
+  <span class="badge" style="margin-bottom:12px;"><%= getCategoryLabel(event.category) %></span>
+  <h1><%= event.title %></h1>
+  <p style="color:var(--text-muted);margin-bottom:0.5rem;">
+    Organized by <strong style="color:var(--text-secondary);"><%= event.createdBy ? event.createdBy.username : 'Unknown' %></strong>
+  </p>
+
+  <!-- Info Grid -->
+  <div class="event-info-grid">
+    <div class="event-info-item">
+      <span class="label">📅 Date</span>
+      <span class="value"><%= formatDate(event.date) %></span>
+    </div>
+    <div class="event-info-item">
+      <span class="label">🕐 Time</span>
+      <span class="value"><%= event.time %></span>
+    </div>
+    <div class="event-info-item">
+      <span class="label">📍 Venue</span>
+      <span class="value"><%= event.venue %></span>
+    </div>
+    <div class="event-info-item">
+      <span class="label">💰 Fee</span>
+      <span class="value"><%= event.fee === 0 ? 'Free' : '₹' + event.fee %></span>
+    </div>
+    <div class="event-info-item">
+      <span class="label">👥 Capacity</span>
+      <span class="value"><%= event.registrations.length %> / <%= event.capacity %></span>
+    </div>
+    <div class="event-info-item">
+      <span class="label">🪑 Seats Left</span>
+      <span class="value">
+        <% if (event.isFull) { %>
+          <span style="color:var(--danger);">Full</span>
+        <% } else { %>
+          <span style="color:var(--success);"><%= event.seatsLeft %></span>
+        <% } %>
+      </span>
+    </div>
+  </div>
+
+  <!-- Description -->
+  <div class="event-description"><%= event.description %></div>
+
+  <!-- Actions -->
+  <div class="event-actions">
+    <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+      <% if (event.isPast) { %>
+        <span class="btn btn-secondary" style="opacity:0.6;cursor:default;">Event has ended</span>
+      <% } else if (isRegistered) { %>
+        <form action="/events/<%= event._id %>/unregister" method="POST" style="display:inline;">
+          <button type="submit" class="btn btn-warning" id="btn-unregister">Unregister</button>
+        </form>
+        <span class="badge badge-success" style="padding:10px 16px;font-size:0.85rem;">✅ You are registered</span>
+      <% } else if (event.isFull) { %>
+        <span class="btn btn-secondary" style="opacity:0.6;cursor:default;">Event is Full</span>
+      <% } else { %>
+        <form action="/events/<%= event._id %>/register" method="POST" style="display:inline;">
+          <button type="submit" class="btn btn-success btn-lg" id="btn-register">Register Now</button>
+        </form>
+      <% } %>
+    <% } else { %>
+      <a href="/auth/login" class="btn btn-primary btn-lg">Login to Register</a>
+    <% } %>
+    <a href="/" class="btn btn-secondary">← Back to Events</a>
+  </div>
+
+  <!-- Comments Section -->
+  <div class="comments-section">
+    <h2>💬 Comments (<%= event.comments ? event.comments.length : 0 %>)</h2>
+
+    <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+      <form action="/events/<%= event._id %>/comments" method="POST" class="comment-form" id="comment-form">
+        <textarea name="text" placeholder="Share your thoughts..." maxlength="500" required></textarea>
+        <button type="submit" class="btn btn-primary btn-sm" style="margin-top:8px;">Post Comment</button>
+      </form>
+    <% } else { %>
+      <p style="color:var(--text-muted);margin-bottom:1.5rem;"><a href="/auth/login">Log in</a> to leave a comment.</p>
+    <% } %>
+
+    <div class="comment-list">
+      <% if (event.comments && event.comments.length > 0) { %>
+        <% event.comments.forEach(comment => { %>
+          <div class="comment-item" id="comment-<%= comment._id %>">
+            <div class="comment-header">
+              <span class="comment-author"><%= comment.author ? comment.author.username : 'Deleted User' %></span>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <span class="comment-date"><%= new Date(comment.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) %></span>
+                <% if (typeof currentUser !== 'undefined' && currentUser && (currentUser._id.toString() === (comment.author ? comment.author._id.toString() : '') || currentUser.role === 'admin' || currentUser.role === 'root_admin')) { %>
+                  <form action="/events/comments/<%= comment._id %>?_method=DELETE" method="POST" class="confirm-delete" style="display:inline;">
+                    <button type="submit" class="comment-delete">🗑 Delete</button>
+                  </form>
+                <% } %>
+              </div>
+            </div>
+            <p class="comment-text"><%= comment.text %></p>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <p style="color:var(--text-muted);text-align:center;padding:2rem;">No comments yet. Be the first!</p>
+      <% } %>
+    </div>
+  </div>
+</div>

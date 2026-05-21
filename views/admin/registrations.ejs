@@ -1,0 +1,43 @@
+<div class="container">
+  <div class="page-header">
+    <h1>👥 Registrations — <%= event.title %></h1>
+    <div style="display:flex;gap:12px;">
+      <a href="/admin/events/<%= event._id %>/registrations/csv" class="btn btn-success btn-sm" id="btn-download-csv">📥 Download CSV</a>
+      <a href="/admin/dashboard" class="btn btn-secondary btn-sm">← Dashboard</a>
+    </div>
+  </div>
+
+  <div class="table-wrapper">
+    <div class="table-header">
+      <h2><%= event.registrations.length %> Registered Attendees</h2>
+    </div>
+    <% if (event.registrations && event.registrations.length > 0) { %>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Registered On</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% event.registrations.forEach((reg, i) => { %>
+            <tr>
+              <td><%= i + 1 %></td>
+              <td><strong style="color:var(--text-primary);"><%= reg.user ? reg.user.username : 'Deleted User' %></strong></td>
+              <td><%= reg.user ? reg.user.email : 'N/A' %></td>
+              <td><%= formatDate(reg.registeredAt) %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <div class="empty-state" style="padding:3rem;">
+        <div class="icon">👤</div>
+        <h3>No Registrations Yet</h3>
+        <p>No one has registered for this event yet.</p>
+      </div>
+    <% } %>
+  </div>
+</div>

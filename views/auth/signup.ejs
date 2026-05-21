@@ -1,0 +1,40 @@
+<div class="container-sm" style="padding-top: 3rem;">
+  <div class="form-card">
+    <h2>Join CampusEvents</h2>
+    <p class="subtitle">Create an account to discover and register for events</p>
+
+    <form action="/auth/signup" method="POST" id="signup-form">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="Your name" minlength="3" maxlength="30" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" placeholder="you@campus.edu" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Min 6 characters" minlength="6" required>
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Re-enter password" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="role">Account Type</label>
+        <select id="role" name="role">
+          <option value="user">Student / Attendee</option>
+          <option value="admin">Event Organizer (Admin)</option>
+        </select>
+      </div>
+      <div class="form-footer">
+        <button type="submit" class="btn btn-primary btn-block btn-lg">Create Account</button>
+      </div>
+    </form>
+
+    <div class="form-divider">Already have an account?</div>
+    <a href="/auth/login" class="btn btn-secondary btn-block" id="goto-login">Log In</a>
+  </div>
+</div>

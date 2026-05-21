@@ -1,0 +1,81 @@
+<div class="container">
+  <div class="page-header">
+    <h1>📊 Admin Dashboard</h1>
+    <div style="display:flex;gap:12px;">
+      <a href="/admin/analytics" class="btn btn-secondary">📈 Analytics</a>
+      <a href="/admin/events/new" class="btn btn-primary" id="btn-create-event">+ New Event</a>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">📅</div>
+      <div class="stat-value"><%= stats.totalEvents %></div>
+      <div class="stat-label">Total Events</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div class="stat-value"><%= stats.totalRegistrations %></div>
+      <div class="stat-label">Total Registrations</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💰</div>
+      <div class="stat-value">₹<%= stats.totalRevenue.toLocaleString() %></div>
+      <div class="stat-label">Total Revenue</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🚀</div>
+      <div class="stat-value"><%= stats.upcomingEvents %></div>
+      <div class="stat-label">Upcoming Events</div>
+    </div>
+  </div>
+
+  <!-- Events Table -->
+  <div class="table-wrapper">
+    <div class="table-header">
+      <h2><%= currentUser.role === 'root_admin' ? 'All Events' : 'Your Events' %></h2>
+    </div>
+    <% if (events && events.length > 0) { %>
+      <table>
+        <thead>
+          <tr>
+            <th>Event</th>
+            <th>Category</th>
+            <th>Date</th>
+            <th>Registrations</th>
+            <th>Fee</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% events.forEach(event => { %>
+            <tr>
+              <td><strong style="color:var(--text-primary);"><%= event.title %></strong></td>
+              <td><span class="badge"><%= getCategoryLabel(event.category) %></span></td>
+              <td><%= formatDate(event.date) %></td>
+              <td><%= event.registrations.length %> / <%= event.capacity %></td>
+              <td><%= event.fee === 0 ? 'Free' : '₹' + event.fee %></td>
+              <td>
+                <div class="table-actions">
+                  <a href="/admin/events/<%= event._id %>/registrations" class="btn btn-secondary btn-sm">👥</a>
+                  <a href="/admin/events/<%= event._id %>/edit" class="btn btn-secondary btn-sm">✏️</a>
+                  <form action="/admin/events/<%= event._id %>?_method=DELETE" method="POST" class="confirm-delete" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">🗑</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <div class="empty-state" style="padding:3rem;">
+        <div class="icon">📭</div>
+        <h3>No Events Yet</h3>
+        <p>Create your first event to get started!</p>
+        <a href="/admin/events/new" class="btn btn-primary">Create Event</a>
+      </div>
+    <% } %>
+  </div>
+</div>

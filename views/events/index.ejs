@@ -1,0 +1,69 @@
+<!-- Hero Section -->
+<section class="hero">
+  <h1>🎓 Discover Campus Events</h1>
+  <p>Find workshops, hackathons, seminars, and more happening on campus. Register in one click!</p>
+</section>
+
+<div class="container">
+  <!-- Filter Bar -->
+  <form class="filter-bar" action="/" method="GET" id="filter-form">
+    <input type="text" name="search" placeholder="🔍 Search events..." value="<%= typeof filters !== 'undefined' && filters.search ? filters.search : '' %>">
+    <select name="category">
+      <option value="all">All Categories</option>
+      <option value="workshop" <%= typeof filters !== 'undefined' && filters.category === 'workshop' ? 'selected' : '' %>>🔧 Workshop</option>
+      <option value="hackathon" <%= typeof filters !== 'undefined' && filters.category === 'hackathon' ? 'selected' : '' %>>💻 Hackathon</option>
+      <option value="seminar" <%= typeof filters !== 'undefined' && filters.category === 'seminar' ? 'selected' : '' %>>🎓 Seminar</option>
+      <option value="competition" <%= typeof filters !== 'undefined' && filters.category === 'competition' ? 'selected' : '' %>>🏆 Competition</option>
+      <option value="cultural" <%= typeof filters !== 'undefined' && filters.category === 'cultural' ? 'selected' : '' %>>🎭 Cultural</option>
+      <option value="sports" <%= typeof filters !== 'undefined' && filters.category === 'sports' ? 'selected' : '' %>>⚽ Sports</option>
+      <option value="club" <%= typeof filters !== 'undefined' && filters.category === 'club' ? 'selected' : '' %>>🎪 Club</option>
+      <option value="other" <%= typeof filters !== 'undefined' && filters.category === 'other' ? 'selected' : '' %>>📌 Other</option>
+    </select>
+    <select name="sort">
+      <option value="date" <%= typeof filters !== 'undefined' && filters.sort === 'date' ? 'selected' : '' %>>Upcoming First</option>
+      <option value="newest" <%= typeof filters !== 'undefined' && filters.sort === 'newest' ? 'selected' : '' %>>Newest</option>
+      <option value="fee-low" <%= typeof filters !== 'undefined' && filters.sort === 'fee-low' ? 'selected' : '' %>>Fee: Low → High</option>
+      <option value="fee-high" <%= typeof filters !== 'undefined' && filters.sort === 'fee-high' ? 'selected' : '' %>>Fee: High → Low</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Filter</button>
+  </form>
+
+  <!-- Events Grid -->
+  <% if (events && events.length > 0) { %>
+    <div class="event-grid">
+      <% events.forEach(event => { %>
+        <a href="/events/<%= event._id %>" class="card" id="event-card-<%= event._id %>" style="color:inherit;">
+          <img src="<%= event.image %>" alt="<%= event.title %>" class="card-img" onerror="this.src='/assets/default-event.svg'">
+          <div class="card-body">
+            <span class="badge"><%= getCategoryLabel(event.category) %></span>
+            <h3 style="margin-top:8px;"><%= event.title %></h3>
+            <p><%= truncateText(event.description) %></p>
+            <div class="card-meta">
+              <span>📅 <%= formatDate(event.date) %></span>
+              <span>📍 <%= event.venue %></span>
+            </div>
+          </div>
+          <div class="card-footer">
+            <% if (event.fee === 0) { %>
+              <span class="badge badge-free">Free</span>
+            <% } else { %>
+              <span style="font-weight:700;color:var(--text-primary);">₹<%= event.fee %></span>
+            <% } %>
+            <% if (event.isFull) { %>
+              <span class="badge badge-danger">Full</span>
+            <% } else { %>
+              <span class="badge badge-success"><%= event.seatsLeft %> seats left</span>
+            <% } %>
+          </div>
+        </a>
+      <% }); %>
+    </div>
+  <% } else { %>
+    <div class="empty-state">
+      <div class="icon">📭</div>
+      <h3>No Events Found</h3>
+      <p>There are no events matching your criteria. Try adjusting your filters.</p>
+      <a href="/" class="btn btn-primary">Clear Filters</a>
+    </div>
+  <% } %>
+</div>

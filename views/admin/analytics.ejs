@@ -1,0 +1,43 @@
+<div class="container">
+  <div class="page-header">
+    <h1>📈 Analytics</h1>
+    <div style="display:flex;gap:12px;">
+      <% if (currentUser && currentUser.role === 'root_admin') { %>
+        <button id="btn-ai-analysis" class="btn btn-primary">🤖 Generate AI Analysis</button>
+      <% } %>
+      <a href="/admin/dashboard" class="btn btn-secondary">← Dashboard</a>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>📊 Registrations per Event</h3>
+      <div style="height:300px;"><canvas id="regPerEvent"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>💰 Revenue per Event</h3>
+      <div style="height:300px;"><canvas id="revenuePerEvent"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>📈 Registrations Over Time</h3>
+      <div style="height:300px;"><canvas id="regsOverTime"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>🏷️ Category Distribution</h3>
+      <div style="height:300px;"><canvas id="categoryDist"></canvas></div>
+    </div>
+  </div>
+
+  <% if (currentUser && currentUser.role === 'root_admin') { %>
+    <div class="ai-report-wrapper" style="margin-top: 2rem; background: var(--bg-card); padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color);">
+      <h2 style="margin-top: 0;">🤖 AI Trend Analysis</h2>
+      <div id="ai-report-container" style="color: var(--text-secondary); line-height: 1.6;">
+        <p>Click "Generate AI Analysis" to get an AI-powered report on your event trends.</p>
+      </div>
+    </div>
+  <% } %>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="/js/analytics.js"></script>

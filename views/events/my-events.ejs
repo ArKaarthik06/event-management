@@ -1,0 +1,37 @@
+<div class="container">
+  <div class="page-header">
+    <h1>📋 My Registered Events</h1>
+    <a href="/" class="btn btn-secondary">Browse More Events</a>
+  </div>
+
+  <% if (events && events.length > 0) { %>
+    <div class="event-grid">
+      <% events.forEach(event => { %>
+        <a href="/events/<%= event._id %>" class="card" style="color:inherit;">
+          <img src="<%= event.image %>" alt="<%= event.title %>" class="card-img" onerror="this.src='/assets/default-event.svg'">
+          <div class="card-body">
+            <span class="badge"><%= getCategoryLabel(event.category) %></span>
+            <h3 style="margin-top:8px;"><%= event.title %></h3>
+            <div class="card-meta">
+              <span>📅 <%= formatDate(event.date) %></span>
+              <span>📍 <%= event.venue %></span>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="badge badge-success">✅ Registered</span>
+            <% if (event.isPast) { %>
+              <span class="badge badge-warning">Past</span>
+            <% } %>
+          </div>
+        </a>
+      <% }); %>
+    </div>
+  <% } else { %>
+    <div class="empty-state">
+      <div class="icon">🎟️</div>
+      <h3>No Registrations Yet</h3>
+      <p>You haven't registered for any events yet. Start exploring!</p>
+      <a href="/" class="btn btn-primary">Browse Events</a>
+    </div>
+  <% } %>
+</div>

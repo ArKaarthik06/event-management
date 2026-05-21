@@ -1,0 +1,6 @@
+<div class="error-page">
+  <div class="code"><%= typeof statusCode !== 'undefined' ? statusCode : 500 %></div>
+  <h2><%= typeof statusCode !== 'undefined' && statusCode === 404 ? 'Page Not Found' : 'Something Went Wrong' %></h2>
+  <p><%= typeof message !== 'undefined' ? message : 'An unexpected error occurred. Please try again.' %></p>
+  <a href="/" class="btn btn-primary">← Back to Home</a>
+</div>
