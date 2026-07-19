@@ -30,10 +30,13 @@
 
   <!-- Events Grid -->
   <% if (events && events.length > 0) { %>
+    <% if (typeof pagination !== 'undefined' && pagination.total) { %>
+      <p style="color:var(--text-secondary); margin-bottom:1rem;">Showing <%= events.length %> of <%= pagination.total %> events</p>
+    <% } %>
     <div class="event-grid">
       <% events.forEach(event => { %>
         <a href="/events/<%= event._id %>" class="card" id="event-card-<%= event._id %>" style="color:inherit;">
-          <img src="<%= event.image %>" alt="<%= event.title %>" class="card-img" onerror="this.src='/assets/default-event.svg'">
+          <img src="<%= event.image %>" alt="<%= event.title %>" class="card-img" onerror="this.src='/assets/event-' + '<%= event.category %>' + '.png'">
           <div class="card-body">
             <span class="badge"><%= getCategoryLabel(event.category) %></span>
             <h3 style="margin-top:8px;"><%= event.title %></h3>
@@ -58,6 +61,30 @@
         </a>
       <% }); %>
     </div>
+
+    <!-- Pagination Controls -->
+    <% if (typeof pagination !== 'undefined' && pagination.totalPages > 1) { %>
+      <div class="pagination" style="display:flex; justify-content:center; align-items:center; gap:12px; margin:2rem 0; flex-wrap:wrap;">
+        <% if (pagination.hasPrev) { %>
+          <a href="/?page=<%= pagination.currentPage - 1 %><%= typeof filters !== 'undefined' && filters.category ? '&category=' + filters.category : '' %><%= typeof filters !== 'undefined' && filters.search ? '&search=' + filters.search : '' %><%= typeof filters !== 'undefined' && filters.sort ? '&sort=' + filters.sort : '' %>"
+             class="btn btn-secondary btn-sm" id="btn-prev-page">← Previous</a>
+        <% } %>
+
+        <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+          <% if (i === pagination.currentPage) { %>
+            <span class="btn btn-primary btn-sm" style="cursor:default; min-width:40px; text-align:center;"><%= i %></span>
+          <% } else { %>
+            <a href="/?page=<%= i %><%= typeof filters !== 'undefined' && filters.category ? '&category=' + filters.category : '' %><%= typeof filters !== 'undefined' && filters.search ? '&search=' + filters.search : '' %><%= typeof filters !== 'undefined' && filters.sort ? '&sort=' + filters.sort : '' %>"
+               class="btn btn-secondary btn-sm" style="min-width:40px; text-align:center;"><%= i %></a>
+          <% } %>
+        <% } %>
+
+        <% if (pagination.hasNext) { %>
+          <a href="/?page=<%= pagination.currentPage + 1 %><%= typeof filters !== 'undefined' && filters.category ? '&category=' + filters.category : '' %><%= typeof filters !== 'undefined' && filters.search ? '&search=' + filters.search : '' %><%= typeof filters !== 'undefined' && filters.sort ? '&sort=' + filters.sort : '' %>"
+             class="btn btn-primary btn-sm" id="btn-next-page">Next →</a>
+        <% } %>
+      </div>
+    <% } %>
   <% } else { %>
     <div class="empty-state">
       <div class="icon">📭</div>

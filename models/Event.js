@@ -85,4 +85,10 @@ eventSchema.virtual('isPast').get(function() {
   return new Date(this.date) < new Date();
 });
 
+// ── Performance Indexes ──────────────────────────────────────
+eventSchema.index({ date: 1 });                    // Sort by date
+eventSchema.index({ category: 1, date: 1 });       // Filter by category + sort by date
+eventSchema.index({ createdBy: 1, date: -1 });     // Admin dashboard: my events sorted
+eventSchema.index({ title: 'text', description: 'text' });  // Text search
+
 module.exports = mongoose.model('Event', eventSchema);

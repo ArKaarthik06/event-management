@@ -296,10 +296,18 @@ const getAiAnalysis = async (req, res) => {
 
     const eventDataSummary = events.map(e => {
       const revenue = e.fee * e.registrations.length;
-      return `- Event: "${e.title}" | Category: ${e.category} | Date: ${new Date(e.date).toDateString()} | Registrations: ${e.registrations.length}/${e.capacity} | Revenue: ₹${revenue}`;
+      const dayOfWeek = new Date(e.date).toLocaleDateString('en-US', { weekday: 'long' });
+      return `- Event: "${e.title}" | Category: ${e.category} | Day: ${dayOfWeek} | Date: ${new Date(e.date).toDateString()} | Time: ${e.time || 'N/A'} | Registrations: ${e.registrations.length}/${e.capacity} | Revenue: ₹${revenue}`;
     }).join('\n');
 
-    const prompt = `You are an expert event data analyst. Analyze the following event registration and revenue data and provide a concise, insightful trend analysis report for the admin. Highlight the most successful events, identify any patterns in categories or registration numbers, and suggest 1-2 actionable recommendations to improve future events.
+    const prompt = `You are an expert event data analyst. Analyze the following event registration and revenue data and provide a concise, insightful trend analysis report for the admin.
+
+Your analysis MUST include:
+1. **Top Performers** — Highlight the most successful events by registrations and revenue.
+2. **Category Trends** — Identify patterns across event categories (which categories attract the most participation).
+3. **Day-of-Week Analysis** — Determine which days of the week see the highest registrations and engagement. Are weekday or weekend events more popular?
+4. **Timing Analysis** — Analyze which time slots (morning, afternoon, evening) drive the best turnout. Recommend optimal scheduling windows.
+5. **Actionable Recommendations** — Suggest 2-3 data-driven recommendations to improve future event planning, including ideal days, times, and categories to focus on.
 
 Data:
 ${eventDataSummary}

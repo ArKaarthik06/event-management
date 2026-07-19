@@ -1,6 +1,6 @@
 <div class="container event-detail">
   <!-- Event Image -->
-  <img src="<%= event.image %>" alt="<%= event.title %>" class="event-detail-img" onerror="this.src='/assets/default-event.svg'">
+  <img src="<%= event.image %>" alt="<%= event.title %>" class="event-detail-img" onerror="this.src='/assets/event-' + '<%= event.category %>' + '.png'">
 
   <!-- Category + Title -->
   <span class="badge" style="margin-bottom:12px;"><%= getCategoryLabel(event.category) %></span>

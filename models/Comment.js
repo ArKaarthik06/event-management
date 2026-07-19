@@ -21,4 +21,7 @@ const commentSchema = new mongoose.Schema({
   timestamps: true
 });
 
+// Index: comments per event, newest first
+commentSchema.index({ event: 1, createdAt: -1 });
+
 module.exports = mongoose.model('Comment', commentSchema);

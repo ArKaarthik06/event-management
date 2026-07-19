@@ -7,6 +7,9 @@ const flash = require('connect-flash');
 const methodOverride = require('method-override');
 const expressLayouts = require('express-ejs-layouts');
 const passport = require('passport');
+const compression = require('compression');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 // Load env vars
 dotenv.config();
@@ -37,6 +40,20 @@ require('./config/passport')(passport);
 
 const app = express();
 
+// ── Performance & Security Middleware ─────────────────────────
+app.use(compression());             // Gzip compress all responses (~70-80% size reduction)
+app.use(helmet({                    // Security headers
+  contentSecurityPolicy: false,     // Disabled for EJS inline scripts/styles
+}));
+
+// Rate limiting on auth routes (prevent brute force)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,         // 15-minute window
+  max: process.env.NODE_ENV === 'production' ? 30 : 100000, // Bypass limit for load testing
+  message: 'Too many attempts. Please try again later.',
+  standardHeaders: true,
+});
+
 // Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -62,8 +79,12 @@ app.use(passport.session());
 // Flash messages
 app.use(flash());
 
-// Static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Static files — with browser cache headers
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: '1d',           // Browser caches CSS/JS/images for 1 day
+  etag: true,
+  lastModified: true,
+}));
 
 // EJS setup
 app.set('view engine', 'ejs');
@@ -93,8 +114,8 @@ app.get('/', getAllEvents);
 // My events (protected)
 app.get('/my-events', protect, getMyEvents);
 
-// Mount routes
-app.use('/auth', authRoutes);
+// Mount routes — apply rate limiter to auth routes
+app.use('/auth', authLimiter, authRoutes);
 app.use('/events', eventRoutes);
 app.use('/events', commentRoutes);
 app.use('/admin', adminRoutes);

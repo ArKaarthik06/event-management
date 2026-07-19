@@ -1,12 +1,17 @@
 const Event = require('../models/Event');
 const User = require('../models/User');
 const { formatDate, truncateText, getCategoryLabel } = require('../utils/helpers');
+const { LRUCache } = require('lru-cache');
 
-// @desc    Landing page — all events
+// ── Event listing cache (60-second TTL, max 100 entries) ──────────────────────
+const eventCache = new LRUCache({ max: 100, ttl: 1000 * 60 });
+
+// @desc    Landing page — all events (with pagination + caching)
 // @route   GET /
 const getAllEvents = async (req, res) => {
   try {
-    const { category, search, sort } = req.query;
+    const { category, search, sort, page = 1 } = req.query;
+    const limit = 12;
     let query = {};
 
     // Filter by category
@@ -31,17 +36,57 @@ const getAllEvents = async (req, res) => {
     if (sort === 'fee-low') sortOption = { fee: 1 };
     if (sort === 'fee-high') sortOption = { fee: -1 };
 
-    const events = await Event.find(query)
-      .sort(sortOption)
-      .populate('createdBy', 'username');
+    // Pagination
+    const pageNum = Math.max(1, parseInt(page));
+    const skip = (pageNum - 1) * limit;
 
-    res.render('events/index', {
+    // ── Cache check ───────────────────────────────────────────────────────────
+    const cacheKey = JSON.stringify({ query, sortOption, pageNum });
+    const cached = eventCache.get(cacheKey);
+
+    if (cached) {
+      return res.render('events/index', {
+        ...cached,
+        formatDate,
+        truncateText,
+        getCategoryLabel,
+      });
+    }
+
+    // ── DB query (parallel: fetch page + count total) ─────────────────────────
+    const [events, total] = await Promise.all([
+      Event.find(query)
+        .sort(sortOption)
+        .skip(skip)
+        .limit(limit)
+        .populate('createdBy', 'username')
+        .lean({ virtuals: true }),
+      Event.countDocuments(query)
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    const viewData = {
       title: 'Campus Events',
       events,
+      filters: { category, search, sort },
+      pagination: {
+        currentPage: pageNum,
+        totalPages,
+        hasNext: pageNum < totalPages,
+        hasPrev: pageNum > 1,
+        total
+      }
+    };
+
+    // Store in cache (TTL = 60s)
+    eventCache.set(cacheKey, viewData);
+
+    res.render('events/index', {
+      ...viewData,
       formatDate,
       truncateText,
       getCategoryLabel,
-      filters: { category, search, sort }
     });
   } catch (error) {
     console.error(error);
